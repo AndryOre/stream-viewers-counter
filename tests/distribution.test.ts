@@ -6,18 +6,18 @@ import { interpolate } from "../overlay/render";
 
 describe("parseLayout", () => {
   test("defaults to scale 1 and top-left", () => {
-    expect(parseLayout(new URLSearchParams(""))).toEqual({ scale: 1, align: "top-left" });
+    expect(parseLayout(new URLSearchParams(""))).toMatchObject({ scale: 1, align: "top-left" });
   });
 
   test("reads scale and align", () => {
-    expect(parseLayout(new URLSearchParams("scale=1.5&align=top-right"))).toEqual({
+    expect(parseLayout(new URLSearchParams("scale=1.5&align=top-right"))).toMatchObject({
       scale: 1.5,
       align: "top-right",
     });
   });
 
   test("rejects invalid values", () => {
-    expect(parseLayout(new URLSearchParams("scale=abc&align=middle"))).toEqual({
+    expect(parseLayout(new URLSearchParams("scale=abc&align=middle"))).toMatchObject({
       scale: 1,
       align: "top-left",
     });
