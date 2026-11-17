@@ -24,10 +24,10 @@
         flex-direction: column;
         gap: 6px;
         padding: 10px 16px;
-        border-radius: 16px;
-        background: rgba(0, 0, 0, 0.55);
-        color: #fff;
-        font-family: "Inter", system-ui, sans-serif;
+        border-radius: var(--pill-radius, 16px);
+        background: var(--pill-bg, rgba(0, 0, 0, 0.55));
+        color: var(--text-color, #fff);
+        font-family: var(--font-family, "Inter", system-ui, sans-serif);
         font-size: 20px;
         font-weight: 400;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
@@ -77,6 +77,23 @@
         font-size: 14px;
         text-transform: uppercase;
         opacity: 0.8;
+      }
+      .layout-horizontal .pill {
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+      }
+      .hide-counts .platform .count {
+        display: none;
+      }
+      .hide-labels .total-label {
+        display: none;
+      }
+      .layout-horizontal.hide-counts .total {
+        order: -1;
+      }
+      .hide-counts .icon {
+        max-width: 56px;
       }
     </style>
   </head>
