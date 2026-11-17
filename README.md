@@ -23,10 +23,10 @@ Save them somewhere you will not delete them.
 
 ## Step 1: Turn on Streamer.bot's server
 
-1. In Streamer.bot, open **Servers/Clients** and choose the server entry (the first one in the list).
+1. In Streamer.bot, open **Servers/Clients** and choose **WebSocket Server** (the exact name you see in the menu).
 2. Keep the default address and port.
 3. Tick **Auto Start**.
-4. Start the server.
+4. Click **Start Server**.
 
 ## Step 2: Connect your accounts
 
