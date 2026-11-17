@@ -1,5 +1,6 @@
 {
   "name": "stream-viewers-counter",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,5 +17,6 @@
     "oxfmt": "latest",
     "oxlint": "latest",
     "typescript": "latest"
-  }
+  },
+  "packageManager": "bun@1.4.4"
 }
