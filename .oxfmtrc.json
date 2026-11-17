@@ -1,0 +1,12 @@
+{
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "bun.lock",
+    ".emet",
+    "docs",
+    "emet.config.json",
+    "streamerbot/fixtures",
+    "*.md"
+  ]
+}
