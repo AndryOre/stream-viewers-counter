@@ -1,0 +1,158 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify tagged commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    permissions:
+      contents: read
+      checks: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          filter: blob:none
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+          no-cache: true
+
+      - name: Fetch the release tag object
+        run: |
+          git fetch --no-tags --force origin "+refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
+
+      - name: Load the tagger's signing keys
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          allowed_signers="${RUNNER_TEMP}/allowed_signers"
+          gh api "users/${ACTOR}/ssh_signing_keys" --jq '.[].key' | sed 's/^/* /' > "${allowed_signers}"
+          gpg_keys=$(gh api "users/${ACTOR}/gpg_keys" --jq '.[].raw_key')
+          if [[ -n "${gpg_keys}" ]]; then
+            printf '%s\n' "${gpg_keys}" | gpg --batch --quiet --import
+          fi
+
+      - name: Release gates (signed annotated tag, version, CHANGELOG)
+        run: |
+          bun scripts/release/gates.ts "${GITHUB_REF_NAME}" --allowed-signers "${RUNNER_TEMP}/allowed_signers"
+
+      - name: Check the tagged commit is on main
+        run: |
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" FETCH_HEAD; then
+            echo "Tagged commit ${GITHUB_SHA} is not on main"
+            exit 1
+          fi
+
+      - name: Require green CI on the tagged commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          deadline=$((SECONDS + 3600))
+          while true; do
+            run_json=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-runs?per_page=100" \
+              --jq '[.check_runs[] | select(.name == "CI passed")] | sort_by(.id) | last // empty') || run_json=''
+            status=$(jq -r '.status // empty' <<< "${run_json}")
+            conclusion=$(jq -r '.conclusion // empty' <<< "${run_json}")
+            if [[ "${status}" == "completed" ]]; then
+              if [[ "${conclusion}" == "success" ]]; then
+                echo "CI passed concluded success for ${GITHUB_SHA}"
+                exit 0
+              fi
+              echo "CI passed concluded ${conclusion} for ${GITHUB_SHA}. Re-run the failed CI job on main, then re-run this workflow."
+              exit 1
+            fi
+            if (( SECONDS >= deadline )); then
+              if [[ -z "${status}" ]]; then
+                echo "No CI passed check run found for ${GITHUB_SHA} after 60 minutes"
+              else
+                echo "CI passed is still ${status} for ${GITHUB_SHA} after 60 minutes"
+              fi
+              exit 1
+            fi
+            echo "CI passed is ${status:-missing}, checking again in 30s"
+            sleep 30
+          done
+
+  release:
+    name: Build and publish release
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - name: Check whether the release already exists
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" > /dev/null 2>&1; then
+            echo "::warning::Release ${GITHUB_REF_NAME} already exists, so nothing is published."
+            echo "exists=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "exists=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.existing.outputs.exists != 'true'
+        with:
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        if: steps.existing.outputs.exists != 'true'
+        with:
+          bun-version-file: package.json
+          no-cache: true
+
+      - name: Install dependencies
+        if: steps.existing.outputs.exists != 'true'
+        run: bun install --frozen-lockfile
+
+      - name: Write the release notes from the CHANGELOG section
+        if: steps.existing.outputs.exists != 'true'
+        run: |
+          bun scripts/release/notes.ts "${GITHUB_REF_NAME}" > "${RUNNER_TEMP}/release-notes.md"
+
+      - name: Build
+        if: steps.existing.outputs.exists != 'true'
+        run: bun run build
+
+      - name: Attest build provenance
+        if: steps.existing.outputs.exists != 'true'
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            dist/overlay.html
+            dist/streamerbot/x-poller.cs
+
+      - name: Publish GitHub Release
+        if: steps.existing.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1; then
+            echo "::warning::Release ${GITHUB_REF_NAME} already exists, so nothing is published."
+            exit 0
+          fi
+          gh release create "${GITHUB_REF_NAME}" dist/overlay.html dist/streamerbot/x-poller.cs \
+            --title "${GITHUB_REF_NAME}" \
+            --notes-file "${RUNNER_TEMP}/release-notes.md" \
+            --verify-tag
