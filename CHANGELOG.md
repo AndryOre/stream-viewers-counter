@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-18
+
+### Added
+
+- `style` option with a minimal look: one row with the total first and small logos, no numbers.
+- `layout`, `labels` and `counts` options to choose a vertical or horizontal row and to show or hide the Total word and each platform number.
+- `color`, `bg`, `opacity`, `font` and `radius` options to change the text color, background color, background opacity, font and corner radius.
+
+### Changed
+
+- README images: normal and minimal screenshots, shown small.
+- README options guide: a table of every setting, copy-paste examples and OBS Custom CSS examples (English and Spanish).
+
 ## [1.0.0] - 2026-11-18
 
 ### Added
@@ -15,5 +28,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Single-file OBS overlay (`overlay.html`) that connects to Streamer.bot and is fully transparent when no platform is live.
 - X Poller Streamer.bot action (`x-poller.cs`) that reads the X live viewer count and broadcasts it to the overlay.
 
-[Unreleased]: https://github.com/AndryOre/stream-viewers-counter/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/AndryOre/stream-viewers-counter/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/AndryOre/stream-viewers-counter/releases/tag/v1.1.0
 [1.0.0]: https://github.com/AndryOre/stream-viewers-counter/releases/tag/v1.0.0
