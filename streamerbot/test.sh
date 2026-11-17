@@ -14,4 +14,5 @@ if ! command -v dotnet >/dev/null 2>&1 || ! dotnet --list-sdks | grep -q '^8\.';
   rm -f "$installer"
 fi
 
+dotnet build "$here/x-poller/XPoller.Compile.csproj" --nologo -v q
 dotnet test "$here/tests/XPoller.Tests.csproj" "$@"

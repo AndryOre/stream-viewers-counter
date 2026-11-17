@@ -61,7 +61,7 @@ export function render(snapshot: BoardSnapshot, root: HTMLElement): void {
   total.className = "total";
   total.append(
     createText("total-label", "Total"),
-    createText("total-count", formatCount(snapshot.total)),
+    createText("total-count", snapshot.total === null ? "–" : formatCount(snapshot.total)),
   );
   pill.append(total);
 

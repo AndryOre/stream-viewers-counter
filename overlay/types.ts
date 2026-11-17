@@ -16,7 +16,7 @@ export interface PlatformSnapshot {
 
 export interface BoardSnapshot {
   platforms: PlatformSnapshot[];
-  total: number;
+  total: number | null;
   anyLive: boolean;
 }
 

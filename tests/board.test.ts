@@ -28,9 +28,9 @@ function reading(overrides: Partial<Reading>): Reading {
 }
 
 describe("ViewerBoard", () => {
-  test("empty board is not live and totals zero", () => {
+  test("empty board is not live and has no total", () => {
     const { board } = makeBoard();
-    expect(board.snapshot()).toEqual({ platforms: [], total: 0, anyLive: false });
+    expect(board.snapshot()).toEqual({ platforms: [], total: null, anyLive: false });
   });
 
   test("a live reading shows the platform and contributes to the total", () => {
@@ -56,7 +56,7 @@ describe("ViewerBoard", () => {
     board.apply(reading({ viewers: null }));
     const snapshot = board.snapshot();
     expect(snapshot.platforms[0]?.viewers).toBeNull();
-    expect(snapshot.total).toBe(0);
+    expect(snapshot.total).toBeNull();
     expect(snapshot.anyLive).toBe(true);
   });
 
@@ -83,6 +83,37 @@ describe("ViewerBoard", () => {
     board.apply(reading({ platform: "twitch", viewers: 1200 }));
     board.apply(reading({ platform: "x", viewers: 213 }));
     expect(board.snapshot().total).toBe(1413);
+  });
+
+  test("a late count after an offline event does not resurrect the platform", () => {
+    const { board } = makeBoard();
+    board.apply(reading({ viewers: 42, receivedAt: 1_000_000 }));
+    board.apply(reading({ live: false, viewers: null, receivedAt: 1_010_000 }));
+    board.apply(reading({ viewers: 50, receivedAt: 1_015_000 }));
+    expect(board.snapshot().anyLive).toBe(false);
+  });
+
+  test("an online event after offline brings the platform back", () => {
+    const { board } = makeBoard();
+    board.apply(reading({ live: false, viewers: null, receivedAt: 1_010_000 }));
+    board.apply(reading({ viewers: null, receivedAt: 1_015_000 }));
+    expect(board.snapshot().anyLive).toBe(true);
+  });
+
+  test("a count long after the offline event is accepted again", () => {
+    const { board } = makeBoard();
+    board.apply(reading({ live: false, viewers: null, receivedAt: 1_000_000 }));
+    board.apply(reading({ viewers: 7, receivedAt: 1_060_000 }));
+    expect(board.snapshot().platforms[0]?.viewers).toBe(7);
+  });
+
+  test("total is null when every live platform is stale", () => {
+    const { board, advance } = makeBoard();
+    board.apply(reading({ viewers: 42, receivedAt: 1_000_000 }));
+    advance(151_000);
+    const snapshot = board.snapshot();
+    expect(snapshot.platforms[0]?.stale).toBe(true);
+    expect(snapshot.total).toBeNull();
   });
 
   test("a platform past the stale window is stale and excluded from the total", () => {
@@ -150,6 +181,20 @@ describe("board persistence", () => {
     const storage = memoryStorage();
     persistBoard(storage, [reading({ receivedAt: 1_000_000 })]);
     expect(restoreBoard(storage, 1_000_000 + STALE_MS + 1)).toEqual([]);
+  });
+
+  test("restore ignores unknown platforms, negative counts and future timestamps", () => {
+    const storage = memoryStorage();
+    storage.setItem(
+      "viewer-board",
+      JSON.stringify([
+        { ...reading({}), platform: "foo" },
+        reading({ viewers: -5 }),
+        reading({ receivedAt: 2_000_000 }),
+        reading({ viewers: 8, receivedAt: 1_000_000 }),
+      ]),
+    );
+    expect(restoreBoard(storage, 1_010_000)).toEqual([reading({ viewers: 8 })]);
   });
 
   test("corrupt storage restores nothing", () => {
