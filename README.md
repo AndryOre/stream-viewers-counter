@@ -66,7 +66,7 @@ Add settings to the end of the file path in the **Local file** box. Start with `
 | `color`   | `ffffff`         | Text color, 3 or 6 hex digits without the `#`, for example `ff0000`.                     |
 | `bg`      | `000000`         | Background color, same format as `color`.                                                |
 | `opacity` | `0.55`           | How solid the background is, from 0 (invisible) to 1 (solid).                            |
-| `font`    | `Inter`          | A font installed on your PC. Letters, digits, spaces and hyphens only, up to 60.         |
+| `font`    | `Inter`          | A font installed on your PC. Letters, digits, spaces and hyphens only, up to 60 characters.        |
 | `radius`  | `16`             | Corner roundness in pixels, from 0 to 48.                                                |
 | `scale`   | `1`              | Size multiplier, from 0.25 to 5. `1.5` makes it 1.5 times bigger.                        |
 | `align`   | `top-left`       | Corner: `top-left`, `top-right`, `bottom-left` or `bottom-right`.                        |
