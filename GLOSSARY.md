@@ -24,6 +24,10 @@ _Avoid_: offline (offline is reported explicitly)
 The sum of viewers across Live Platforms that are not stale.
 _Avoid_: views, audience
 
+**Style**:
+A named preset of the overlay's look: `full` (default) or `minimal`.
+_Avoid_: theme, mode
+
 **X Poller**:
 The Streamer.bot action that produces X Readings.
 _Avoid_: X scraper bot
