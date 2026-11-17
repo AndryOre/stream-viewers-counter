@@ -6,11 +6,13 @@ Muestra cuántas personas están viendo tu stream en vivo, directamente en panta
 
 Ves un ícono y un contador por cada plataforma (Twitch, YouTube, Kick y X), además de un **Total**. Cuando nadie está en vivo, el overlay es invisible.
 
+![El overlay mostrando los contadores de Twitch, YouTube, Kick y X y un Total](docs/images/overlay.png)
+
 ## Qué necesitas
 
-- OBS
-- Streamer.bot (gratis)
-- Tus cuentas de Twitch, YouTube, Kick y/o X
+- [OBS](https://obsproject.com) (gratis)
+- [Streamer.bot](https://streamer.bot) (gratis)
+- Tus cuentas de [Twitch](https://www.twitch.tv), [YouTube](https://www.youtube.com), [Kick](https://kick.com) y/o [X](https://x.com)
 
 ## Descarga
 
