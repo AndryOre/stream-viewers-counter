@@ -6,7 +6,7 @@ Muestra cuántas personas están viendo tu stream en vivo, directamente en panta
 
 Ves un ícono y un contador por cada plataforma (Twitch, YouTube, Kick y X), además de un **Total**. Cuando nadie está en vivo, el overlay es invisible.
 
-![El overlay mostrando los contadores de Twitch, YouTube, Kick y X y un Total](docs/images/overlay.png)
+<img src="docs/images/overlay.png" alt="El overlay normal: una columna con los contadores de Twitch, YouTube, Kick y X y un Total" width="260"> <img src="docs/images/overlay-minimal.png" alt="El overlay minimal: una fila con el total y luego los logos de Twitch, YouTube, Kick y X" width="260">
 
 ## Qué necesitas
 
@@ -53,19 +53,70 @@ Salta este paso si no haces stream en X.
 3. Haz clic en **Browse** y elige `overlay.html`.
 4. Pon el ancho y el alto en 1920 y 1080.
 
-## Cambia el tamaño o la esquina
+## Personaliza el aspecto
 
-Agrega ajustes al final de la ruta del archivo en el cuadro **Local file**. Empiezan con `?` y se unen con `&`.
+Agrega ajustes al final de la ruta del archivo en el cuadro **Local file**. Empiezan con `?` y se unen con `&`. Todos son opcionales, y si falta un valor o no es válido se usa el predeterminado.
 
-- `?scale=1.5` lo hace 1.5 veces más grande. Puedes usar cualquier número entre 0.25 y 5.
-- `?align=top-right` lo mueve a la esquina superior derecha.
+| Ajuste    | Predeterminado   | Qué hace                                                                                         |
+| --------- | ---------------- | ------------------------------------------------------------------------------------------------ |
+| `style`   | `full`           | `full` o `minimal`. Minimal es una sola fila: el total primero, luego logos pequeños, sin números. |
+| `layout`  | `vertical`       | `vertical` u `horizontal`. Tiene prioridad sobre la disposición del estilo.                      |
+| `labels`  | `on`             | `on` u `off`. Muestra u oculta la palabra "Total". Tiene prioridad sobre el estilo.              |
+| `counts`  | `on`             | `on` u `off`. Muestra u oculta el número de cada plataforma. Tiene prioridad sobre el estilo.    |
+| `color`   | `ffffff`         | Color del texto, 3 o 6 dígitos hexadecimales sin el `#`, por ejemplo `ff0000`.                   |
+| `bg`      | `000000`         | Color del fondo, con el mismo formato que `color`.                                               |
+| `opacity` | `0.55`           | Qué tan sólido es el fondo, de 0 (invisible) a 1 (sólido).                                       |
+| `font`    | `Inter`          | Una fuente instalada en tu PC. Solo letras, dígitos, espacios y guiones, hasta 60 caracteres.    |
+| `radius`  | `16`             | Redondez de las esquinas en píxeles, de 0 a 48.                                                  |
+| `scale`   | `1`              | Multiplicador de tamaño, de 0.25 a 5. `1.5` lo hace 1.5 veces más grande.                        |
+| `align`   | `top-left`       | Esquina: `top-left`, `top-right`, `bottom-left` o `bottom-right`.                                |
 
-Las cuatro esquinas son `top-left` (la predeterminada), `top-right`, `bottom-left` y `bottom-right`.
+### Ejemplos para copiar y pegar
 
-Ambos juntos se ven así:
+Minimal:
 
 ```
-C:/Overlays/overlay.html?scale=1.5&align=top-right
+C:/Overlays/overlay.html?style=minimal
+```
+
+Minimal en la esquina inferior derecha:
+
+```
+C:/Overlays/overlay.html?style=minimal&align=bottom-right
+```
+
+Texto rojo sobre fondo azul oscuro:
+
+```
+C:/Overlays/overlay.html?color=ff0000&bg=112233&opacity=0.8
+```
+
+Otra fuente (debe estar instalada en tu PC):
+
+```
+C:/Overlays/overlay.html?font=Montserrat
+```
+
+### Avanzado: CSS personalizado de OBS
+
+La fuente Browser de OBS tiene un cuadro **Custom CSS**. Lo que escribas ahí se aplica encima del overlay. Estos nombres están disponibles: `.pill` (la caja de fondo), `.platform` (una plataforma), `.total` (el Total) y `.count` (el número de una plataforma).
+
+Quitar el fondo:
+
+```css
+.pill { background: none; }
+```
+
+Números de plataforma más grandes:
+
+```css
+.count { font-size: 28px; }
+```
+
+Agregar espacio entre las plataformas:
+
+```css
+.platform { margin: 6px 0; }
 ```
 
 ## Solución de problemas
@@ -137,6 +188,8 @@ Agrégalos a la ruta del archivo local como query string, por ejemplo `file:///p
 | `password` | ninguno           | Contraseña del WebSocket de Streamer.bot                       |
 | `scale`    | `1`               | Multiplicador de tamaño (0.25 a 5)                             |
 | `align`    | `top-left`        | `top-left`, `top-right`, `bottom-left` o `bottom-right`        |
+
+Los ajustes visuales (`style`, `layout`, `labels`, `counts`, `color`, `bg`, `opacity`, `font`, `radius`) están en "Personaliza el aspecto" más arriba.
 
 Si defines una contraseña para el servidor en Streamer.bot, pásala con `?password=`. El overlay se reconecta automáticamente cuando Streamer.bot se reinicia y restaura el último tablero desde `localStorage` después de recargar.
 

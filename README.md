@@ -6,7 +6,7 @@ Shows how many people are watching your stream live, right on screen in OBS.
 
 You see an icon and a count for each platform (Twitch, YouTube, Kick and X), plus a **Total**. When nobody is live, the overlay is invisible.
 
-![The overlay showing Twitch, YouTube, Kick and X viewer counts and a Total](docs/images/overlay.png)
+<img src="docs/images/overlay.png" alt="The normal overlay: a column with Twitch, YouTube, Kick and X counts and a Total" width="260"> <img src="docs/images/overlay-minimal.png" alt="The minimal overlay: one row with the total, then the Twitch, YouTube, Kick and X logos" width="260">
 
 ## What you need
 
@@ -53,19 +53,70 @@ Skip this step if you do not stream on X.
 3. Click **Browse** and pick `overlay.html`.
 4. Set the width and height to 1920 and 1080.
 
-## Change the size or the corner
+## Customize the look
 
-Add settings to the end of the file path in the **Local file** box. Start with `?` and join several with `&`.
+Add settings to the end of the file path in the **Local file** box. Start with `?` and join several with `&`. Every setting is optional, and a missing or invalid value uses the default.
 
-- `?scale=1.5` makes it 1.5 times bigger. Pick any number from 0.25 to 5.
-- `?align=top-right` moves it to the top right corner.
+| Setting   | Default          | What it does                                                                             |
+| --------- | ---------------- | ---------------------------------------------------------------------------------------- |
+| `style`   | `full`           | `full` or `minimal`. Minimal is one row: the total first, then small logos, no numbers.  |
+| `layout`  | `vertical`       | `vertical` or `horizontal`. Overrides the layout of the style.                           |
+| `labels`  | `on`             | `on` or `off`. Shows or hides the word "Total". Overrides the style.                     |
+| `counts`  | `on`             | `on` or `off`. Shows or hides the number of each platform. Overrides the style.          |
+| `color`   | `ffffff`         | Text color, 3 or 6 hex digits without the `#`, for example `ff0000`.                     |
+| `bg`      | `000000`         | Background color, same format as `color`.                                                |
+| `opacity` | `0.55`           | How solid the background is, from 0 (invisible) to 1 (solid).                            |
+| `font`    | `Inter`          | A font installed on your PC. Letters, digits, spaces and hyphens only, up to 60.         |
+| `radius`  | `16`             | Corner roundness in pixels, from 0 to 48.                                                |
+| `scale`   | `1`              | Size multiplier, from 0.25 to 5. `1.5` makes it 1.5 times bigger.                        |
+| `align`   | `top-left`       | Corner: `top-left`, `top-right`, `bottom-left` or `bottom-right`.                        |
 
-The four corners are `top-left` (the default), `top-right`, `bottom-left` and `bottom-right`.
+### Copy-paste examples
 
-Both together look like this:
+Minimal:
 
 ```
-C:/Overlays/overlay.html?scale=1.5&align=top-right
+C:/Overlays/overlay.html?style=minimal
+```
+
+Minimal in the bottom right corner:
+
+```
+C:/Overlays/overlay.html?style=minimal&align=bottom-right
+```
+
+Red text on a dark blue background:
+
+```
+C:/Overlays/overlay.html?color=ff0000&bg=112233&opacity=0.8
+```
+
+A different font (it must be installed on your PC):
+
+```
+C:/Overlays/overlay.html?font=Montserrat
+```
+
+### Advanced: OBS Custom CSS
+
+In the OBS Browser source there is a **Custom CSS** box. Anything you write there is applied on top of the overlay. These names are available: `.pill` (the background box), `.platform` (one platform), `.total` (the Total) and `.count` (a platform number).
+
+Hide the background:
+
+```css
+.pill { background: none; }
+```
+
+Bigger platform numbers:
+
+```css
+.count { font-size: 28px; }
+```
+
+Add space between the platforms:
+
+```css
+.platform { margin: 6px 0; }
 ```
 
 ## Troubleshooting
@@ -137,6 +188,8 @@ Append them to the local file path as a query string, for example `file:///path/
 | `password` | none        | Streamer.bot WebSocket password                          |
 | `scale`    | `1`         | Size multiplier (0.25 to 5)                              |
 | `align`    | `top-left`  | `top-left`, `top-right`, `bottom-left` or `bottom-right` |
+
+The visual settings (`style`, `layout`, `labels`, `counts`, `color`, `bg`, `opacity`, `font`, `radius`) are listed in "Customize the look" above.
 
 If you set a server password in Streamer.bot, pass it with `?password=`. The overlay reconnects automatically when Streamer.bot restarts, and restores the last board from `localStorage` after a reload.
 
