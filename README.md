@@ -6,11 +6,13 @@ Shows how many people are watching your stream live, right on screen in OBS.
 
 You see an icon and a count for each platform (Twitch, YouTube, Kick and X), plus a **Total**. When nobody is live, the overlay is invisible.
 
+![The overlay showing Twitch, YouTube, Kick and X viewer counts and a Total](docs/images/overlay.png)
+
 ## What you need
 
-- OBS
-- Streamer.bot (free)
-- Your Twitch, YouTube, Kick and/or X accounts
+- [OBS](https://obsproject.com) (free)
+- [Streamer.bot](https://streamer.bot) (free)
+- Your [Twitch](https://www.twitch.tv), [YouTube](https://www.youtube.com), [Kick](https://kick.com) and/or [X](https://x.com) accounts
 
 ## Download
 
