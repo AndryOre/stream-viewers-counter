@@ -6,6 +6,7 @@ export interface Reading {
   live: boolean;
   viewers: number | null;
   receivedAt: number;
+  countOnly?: boolean;
 }
 
 export interface PlatformSnapshot {

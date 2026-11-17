@@ -37,6 +37,7 @@ export function createViewerBoard(options: BoardOptions): ViewerBoard {
     }
     const wentOfflineAt = offlineAt.get(id);
     if (wentOfflineAt !== undefined) {
+      if (reading.countOnly) return;
       const isCountOnly = reading.viewers !== null;
       if (isCountOnly && reading.receivedAt - wentOfflineAt <= OFFLINE_GRACE_MS) return;
       offlineAt.delete(id);

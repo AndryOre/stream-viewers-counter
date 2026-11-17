@@ -4,41 +4,69 @@
     <meta charset="utf-8" />
     <title>Stream Viewers Counter</title>
     <style>
+      /*__INTER_FONT_FACE__*/
       html,
       body {
         margin: 0;
         background: transparent;
+        overflow: hidden;
       }
       #root {
         position: fixed;
         top: 16px;
         left: 16px;
+        display: flex;
+        flex-direction: column;
+        transform-origin: left top;
       }
       .pill {
         display: flex;
         flex-direction: column;
         gap: 6px;
-        padding: 10px 14px;
-        border-radius: 14px;
+        padding: 10px 16px;
+        border-radius: 16px;
         background: rgba(0, 0, 0, 0.55);
         color: #fff;
-        font-family: sans-serif;
+        font-family: "Inter", system-ui, sans-serif;
         font-size: 20px;
+        font-weight: 400;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        font-variant-numeric: tabular-nums;
+        opacity: 0;
+        transition: opacity 300ms ease;
+      }
+      .pill.shown {
+        opacity: 1;
       }
       .platform,
       .total {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
       }
-      .platform.stale {
+      .platform {
+        opacity: 0;
+        transition:
+          opacity 300ms ease,
+          filter 300ms ease;
+      }
+      .platform.visible {
+        opacity: 1;
+      }
+      .platform.visible.stale {
         opacity: 0.4;
         filter: grayscale(1);
       }
-      .icon {
-        width: 22px;
+      .icon-slot {
+        display: flex;
+        align-items: center;
         height: 22px;
+      }
+      .icon {
+        height: 22px;
+        width: auto;
+        max-width: 72px;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
       }
       .total {
         font-weight: 700;
