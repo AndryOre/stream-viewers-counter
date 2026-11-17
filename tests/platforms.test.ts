@@ -43,7 +43,14 @@ describe("youtube adapters", () => {
   test("statistics carry concurrentViewers keyed by broadcast id", () => {
     expect(
       run("YouTube.StatisticsUpdated", { broadcast: { id: "A" }, concurrentViewers: 15 }),
-    ).toEqual({ platform: "youtube", key: "A", live: true, viewers: 15, receivedAt: NOW });
+    ).toEqual({
+      platform: "youtube",
+      key: "A",
+      live: true,
+      viewers: 15,
+      receivedAt: NOW,
+      countOnly: true,
+    });
   });
 
   test("concurrentViewers as a numeric string is accepted", () => {
@@ -86,6 +93,17 @@ describe("youtube adapters", () => {
       total: 40,
       anyLive: true,
     });
+  });
+
+  test("a late count-less statistics event after BroadcastEnded does not resurrect the broadcast", () => {
+    const { board, feed, advance } = makeBoard();
+    feed("YouTube.StatisticsUpdated", { broadcast: { id: "A" } });
+    feed("YouTube.BroadcastEnded", { broadcast: { id: "A" } });
+    advance(500);
+    feed("YouTube.StatisticsUpdated", { broadcast: { id: "A" } });
+    expect(board.snapshot().anyLive).toBe(false);
+    advance(200_000);
+    expect(board.snapshot().anyLive).toBe(false);
   });
 
   test("a late viewer event after BroadcastEnded does not resurrect the broadcast", () => {

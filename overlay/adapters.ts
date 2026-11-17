@@ -68,8 +68,10 @@ export const adapters: Record<string, EventAdapter> = {
   ...viewerCountPlatform("kick", "Kick"),
   "YouTube.BroadcastStarted": (data, now) =>
     reading("youtube", true, null, now, readBroadcastKey(data)),
-  "YouTube.StatisticsUpdated": (data, now) =>
-    reading("youtube", true, readConcurrentViewers(data), now, readBroadcastKey(data)),
+  "YouTube.StatisticsUpdated": (data, now) => ({
+    ...reading("youtube", true, readConcurrentViewers(data), now, readBroadcastKey(data)),
+    countOnly: true,
+  }),
   "YouTube.BroadcastEnded": (data, now) =>
     reading("youtube", false, null, now, readBroadcastKey(data)),
   "General.Custom": xViewers,
