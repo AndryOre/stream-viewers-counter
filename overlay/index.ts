@@ -1,5 +1,6 @@
 import { adapters } from "./adapters";
 import { STALE_AFTER_MS, createViewerBoard, persistBoard, restoreBoard } from "./board";
+import { applyLayout, parseLayout } from "./layout";
 import { render } from "./render";
 import { connectStreamerbot } from "./streamerbot";
 
@@ -15,6 +16,7 @@ function start(): void {
   if (!root) throw new Error("Missing #root element");
 
   const params = new URLSearchParams(window.location.search);
+  applyLayout(root, parseLayout(params));
   const board = createViewerBoard({ staleAfterMs: STALE_AFTER_MS, now: Date.now });
 
   for (const reading of restoreBoard(window.localStorage, Date.now())) board.apply(reading);
